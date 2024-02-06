@@ -43,6 +43,55 @@ const productCreateSchema = {
     }
 }
 
+const productUpdateSchema = {
+    title: {
+        optional: {
+            nullable: true,
+            checkFalsy: true
+        },
+        isLength: {
+            options: {
+                min: 5,
+                max: 255
+            },
+            errorMessage: 'title must be between 5-255 characters long'
+        },
+        isString: {
+            errorMessage: 'title can only contain string type'
+        }
+    },
+    description: {
+        optional: {
+            nullable: true,
+            checkFalsy: true
+        },
+        isString: {
+            errorMessage: 'description can only contain string type'
+        }
+    },
+    price: {
+        optional: {
+            nullable: true,
+            checkFalsy: true
+        },
+        isDecimal: {
+            options: {
+                decimal_digits: '2',
+                force_decimal: true
+            },
+            errorMessage: 'price is not a valid'
+        },
+        isLength: {
+            options: {
+                min: 1,
+                max: 8
+            },
+            errorMessage: 'price value can be between 1-8 long'
+        }
+    }
+}
+
 module.exports = {
     productCreateSchema,
+    productUpdateSchema
 };
