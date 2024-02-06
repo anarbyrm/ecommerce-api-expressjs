@@ -3,7 +3,7 @@ const { checkSchema, matchedData, validationResult } = require('express-validato
 
 const Product = require('../models/products');
 const { productCreateSchema, productUpdateSchema } = require('../schemas/product');
-const { getProductID } = require('../middlewares/products');
+const { getProductByID } = require('../middlewares/products');
 
 const router = Router();
 
@@ -49,65 +49,40 @@ router.post('/', checkSchema(productCreateSchema) , (req, res) => {
         });
 });
 
-router.get('/:productID', getProductID, (req, res) => {
-    const productID = req.productID;
-    Product.findByPk(productID)
-        .then((product) => {
-            if (!product) {
-                throw new Error();
-            }
-            res.status(200).json({
-                message: 'success',
-                data: product
-            });
-        })
-        .catch(() => {
-            res.status(404).json({
-                message: 'error',
-                detail: `product with ID ${productID} not found`
-            });
-        })
+router.get('/:productID', getProductByID, (req, res) => {
+    const product = req.product;
+    res.status(200).json({
+        message: 'success',
+        data: product
+    });
 });
 
-router.delete('/:productID', getProductID, (req, res) => {
-    const productID = req.productID;
-    Product.findByPk(productID)
-        .then((product) => {
-            if (!product) {
-                throw new Error();
-            }
-            return product.destroy();
-        })
+router.delete('/:productID', getProductByID, (req, res) => {
+    const product = req.product;
+    product.destroy()
         .then(() => {
             res.sendStatus(204);
         })
         .catch(() => {
-            res.status(404).json({
+            res.send(500).json({
                 message: 'error',
-                detail: `product with ID ${productID} not found`
-            });
-        })
+                detail: 'product could be deleted'
+            })
+        });
 });
 
-router.put('/:productID', 
-            [checkSchema(productUpdateSchema), getProductID],
-            (req, res) => {
-    const productID = req.productID;
-    Product.findByPk(productID)
-        .then((product) => {
-            if (!product) {
-                throw new Error();
-            }
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.status(422).json({
-                    message: 'error',
-                    detail: errors.array()
-                });
-            }
-            const data = matchedData(req);
-            return product.update({ ...product, ...data});
-        })
+router.put('/:productID', [checkSchema(productUpdateSchema), getProductByID], (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            message: 'error',
+            detail: errors.array()
+        });
+    }
+    const data = matchedData(req);
+
+    const product = req.product;
+    product.update({ ...product, ...data})
         .then((updatedProduct) => {
             res.status(200).json({
                 message: 'success',
@@ -115,11 +90,11 @@ router.put('/:productID',
             });
         })
         .catch(() => {
-            res.status(404).json({
+            res.status(500).json({
                 message: 'error',
-                detail: `product with ID ${productID} not found`
+                detail: `product could not be updated`
             });
-        })
+        });
 })
 
 module.exports = router;
