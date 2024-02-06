@@ -59,12 +59,38 @@ router.get('/:productID', (req, res) => {
     Product.findByPk(productID)
         .then((product) => {
             if (!product) {
-                throw new Error('no such product exists');
+                throw new Error();
             }
             res.status(200).json({
                 message: 'success',
                 data: product
             });
+        })
+        .catch(() => {
+            res.status(404).json({
+                message: 'error',
+                detail: `product with ID ${productID} not found`
+            });
+        })
+});
+
+router.delete('/:productID', (req, res) => {
+    const productID = parseInt(req.params.productID);
+    if (isNaN(productID)) {
+        return res.status(400).json({
+            message: 'error',
+            detail: 'invalid product ID'
+        });
+    }
+    Product.findByPk(productID)
+        .then((product) => {
+            if (!product) {
+                throw new Error();
+            }
+            return product.destroy();
+        })
+        .then(() => {
+            res.sendStatus(204);
         })
         .catch(() => {
             res.status(404).json({
