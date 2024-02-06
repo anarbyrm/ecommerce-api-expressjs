@@ -14,8 +14,7 @@ router.get('/', (req, res) => {
                 data: products
             });
         })
-        .catch((err) => {
-            console.log(err);
+        .catch(() => {
             res.status(404).json({
                 message: 'error',
                 detail: 'products not found'
@@ -41,13 +40,38 @@ router.post('/', checkSchema(productCreateSchema) , (req, res) => {
                 data: product
             })
         })
-        .catch((err) => {
-            console.log(err);
+        .catch(() => {
             res.status(400).json({
                 message: 'error',
                 detail: 'cannot create product'
             });
         });
+});
+
+router.get('/:productID', (req, res) => {
+    const productID = parseInt(req.params.productID);
+    if (isNaN(productID)) {
+        return res.status(400).json({
+            message: 'error',
+            detail: 'invalid product ID'
+        });
+    }
+    Product.findByPk(productID)
+        .then((product) => {
+            if (!product) {
+                throw new Error('no such product exists');
+            }
+            res.status(200).json({
+                message: 'success',
+                data: product
+            });
+        })
+        .catch(() => {
+            res.status(404).json({
+                message: 'error',
+                detail: `product with ID ${productID} not found`
+            });
+        })
 });
 
 module.exports = router;
