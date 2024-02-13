@@ -1,6 +1,6 @@
 const { matchedData, validationResult } = require('express-validator');
 
-const Product = require('../models/config');
+const { Product } = require('../models/config');
 
 exports.getAllProducts = (req, res) => {
     Product.findAll()
