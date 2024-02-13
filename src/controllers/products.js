@@ -10,10 +10,10 @@ exports.getAllProducts = (req, res) => {
                 data: products
             });
         })
-        .catch(() => {
-            res.status(404).json({
+        .catch(err => {
+            res.status(500).json({
                 message: 'error',
-                detail: 'products not found'
+                detail: err
             });
         });
 };
@@ -36,10 +36,10 @@ exports.createProduct = (req, res) => {
                 data: product
             })
         })
-        .catch(() => {
-            res.status(400).json({
+        .catch((err) => {
+            res.status(500).json({
                 message: 'error',
-                detail: 'cannot create product'
+                detail: err
             });
         });
 };

@@ -3,6 +3,7 @@ const { checkSchema } = require('express-validator');
 
 const { productCreateSchema, productUpdateSchema } = require('../schemas/product');
 const { getProductByID } = require('../middlewares/products');
+const { isAdmin } = require('../middlewares/users');
 const { 
     getAllProducts,
     getSingleProduct,
@@ -15,12 +16,18 @@ const router = Router();
 
 router.get('/', getAllProducts);
 
-router.post('/', checkSchema(productCreateSchema), createProduct);
+router.post('/',
+            [isAdmin, checkSchema(productCreateSchema)],
+            createProduct);
 
 router.get('/:productID', getProductByID, getSingleProduct);
 
-router.delete('/:productID', getProductByID, deleteProduct);
+router.delete('/:productID',
+              [isAdmin, getProductByID],
+              deleteProduct);
 
-router.put('/:productID', [checkSchema(productUpdateSchema), getProductByID], updateProduct);
+router.put('/:productID',
+          [isAdmin, checkSchema(productUpdateSchema), getProductByID],
+          updateProduct);
 
 module.exports = router;
