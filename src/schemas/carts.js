@@ -1,4 +1,4 @@
-const cartItemSchema = {
+const cartItemAddSchema = {
     productID: {
         isNumeric: {
             errorMessage: "productID is have to be an integer"
@@ -9,6 +9,18 @@ const cartItemSchema = {
     }
 }
 
+const cartItemDeleteSchema = {
+    itemID: {
+        isNumeric: {
+            errorMessage: "itemID is have to be an integer"
+        },
+        notEmpty: {
+            errorMessage: "itemID is required"
+        }
+    }
+}
+
 module.exports = {
-    cartItemSchema,
+    cartItemAddSchema,
+    cartItemDeleteSchema
 }

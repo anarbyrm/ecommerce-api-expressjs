@@ -52,17 +52,39 @@ const addToCart = async (req, res) => {
     }
 }
 
-// const removeFromCart = (req, res) => {
-//     /* 
-//     1) get id of product
-//     2) get user
-//     3) get cart related to user
-//     4) remove product as a CartItem 
-//     */
-// }
+const removeFromCart = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(422).json({
+                message: 'error',
+                detail: errors.array()
+            })
+        }
+
+        const { itemID } = matchedData(req);
+
+        const cartItem = await CartItem.findByPk(itemID);
+        
+        await cartItem.destroy();
+
+        res.status(204).json({
+            message: 'success',
+            detail: 'item has been successfully deleted from cart'
+        })
+
+    } catch (err) {
+        res.status(500).json({
+            message: 'error',
+            detail: err
+        })
+    }
+}
 
 
 
 module.exports = {
     addToCart,
+    removeFromCart
 }
