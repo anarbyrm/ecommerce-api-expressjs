@@ -2,8 +2,7 @@ const { validationResult, matchedData } = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const User = require('../models/users');
-const { email } = require('../schemas/users');
+const { User, Cart } = require('../models/config');
 
 const createUser = (req, res) => {
     const errors = validationResult(req);
@@ -24,13 +23,23 @@ const createUser = (req, res) => {
             // store user data in db 
             User.create({ ...data })
                 .then(user => {
-                    const userData = { ...user };
-                    delete userData.password;
-
-                    res.status(201).json({
-                        message: 'success',
-                        data: userData
-                    })
+                    Cart.create()
+                        .then(cart => {
+                            user.setCart(cart);
+                            res.status(201).json({
+                                message: 'success',
+                                data: {
+                                    email: user.email,
+                                    createdAt: user.createdAt
+                                }
+                            });
+                        })
+                        .catch(error => {
+                            res.status(500).json({
+                                message: 'error',
+                                detail: error
+                            });
+                        });
                 })
                 .catch(error => {
                     res.status(500).json({

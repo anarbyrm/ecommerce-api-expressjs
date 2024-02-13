@@ -1,16 +1,24 @@
-// const { DataTypes } = require('sequelize');
-// const db = require('../utils/database');
-
-// const Item = db.define('Item', {
-//     id: {},
-//     product: {},
-
-// })
-
-// const Cart = db.define('Cart', {})
+const { DataTypes } = require('sequelize');
+const sequelize = require('../utils/database');
 
 
-// module.exports = {
-//     Item,
-//     Cart
-// }
+const CartItem = sequelize.define('item', {
+    quantity: {
+        type: DataTypes.INTEGER,
+        defaultValue: 1
+    }
+})
+
+const Cart = sequelize.define('cart', {
+    uuid: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        allowNull: false,
+        primaryKey: true
+    }
+})
+
+module.exports = {
+    CartItem,
+    Cart
+}
