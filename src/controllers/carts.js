@@ -1,7 +1,8 @@
+const { matchedData, validationResult } = require('express-validator');
+
 const { CartItem, Product } = require('../models/config');
 const sequelize = require('../utils/database')
-
-const { matchedData, validationResult } = require('express-validator');
+const { calculateCartTotal } = require('../utils/carts');
 
 const addToCart = async (req, res) => {
     const t = await sequelize.transaction();
@@ -47,7 +48,7 @@ const addToCart = async (req, res) => {
 
         res.status(500).json({
             message: 'error',
-            detail: err
+            detail: err.message
         })
     }
 }
@@ -77,7 +78,7 @@ const removeFromCart = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message: 'error',
-            detail: err
+            detail: err.message
         })
     }
 }
@@ -87,15 +88,20 @@ const getCart = async (req, res) => {
         const cart = await req.user.getCart();
         const cartItems = await cart.getProducts();
 
+        const total = await calculateCartTotal(cartItems);
+
         res.status(200).json({
             message: 'success',
-            data: cartItems
+            data: {
+                totalPrice: total,
+                items: cartItems
+            }
         })
 
     } catch (err) {
         res.status(500).json({
             message: 'error',
-            detail: err 
+            detail: err.message
         })
     }
 }
